@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04060d">
+<meta name="description" content="Das System – dein Trainingslog im Solo-Leveling-Stil.">
+<title>THE SYSTEM</title>
+<!-- iOS: Vollbild-Betrieb nach „Zum Home-Bildschirm" -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SYSTEM">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="booting">
+
+<!-- ── Hintergrund-Ebenen ─────────────────────────────────────────── -->
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="bg-scanlines" aria-hidden="true"></div>
+<canvas class="bg-particles" id="particles" aria-hidden="true"></canvas>
+
+<!-- ── Kopfzeile ──────────────────────────────────────────────────── -->
+<header class="topbar" id="topbar" hidden>
+  <div class="topbar__id">
+    <span class="rank-badge" id="topRank">E</span>
+    <div class="topbar__name">
+      <strong id="topPlayer">PLAYER</strong>
+      <small id="topTitle">Keiner</small>
+    </div>
+  </div>
+  <div class="topbar__timer" id="topTimer" title="Verbleibende Zeit für die Daily Quest">
+    <span class="topbar__timer-label">VERBLEIBEND</span>
+    <span class="topbar__timer-value" id="countdown">--:--:--</span>
+  </div>
+</header>
+
+<!-- ── Ansichten ──────────────────────────────────────────────────── -->
+<main id="main">
+
+  <!-- Awakening / Onboarding -->
+  <section class="view" id="view-awakening" data-view="awakening"></section>
+
+  <!-- Statusfenster -->
+  <section class="view" id="view-status" data-view="status" hidden></section>
+
+  <!-- Daily Quest & Workout -->
+  <section class="view" id="view-quest" data-view="quest" hidden></section>
+
+  <!-- Statistiken -->
+  <section class="view" id="view-stats" data-view="stats" hidden></section>
+
+  <!-- Einstellungen -->
+  <section class="view" id="view-settings" data-view="settings" hidden></section>
+
+</main>
+
+<!-- ── Navigation ─────────────────────────────────────────────────── -->
+<nav class="navbar" id="navbar" hidden>
+  <button class="nav-btn is-active" data-nav="status" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 7v6c0 4.6 3.4 8.3 8 9 4.6-.7 8-4.4 8-9V7l-8-4Z"/></svg>
+    <span>Status</span>
+  </button>
+  <button class="nav-btn" data-nav="quest" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v6h6"/><path d="m8.5 14.5 2 2 4-4"/></svg>
+    <span>Quest</span>
+    <i class="nav-dot" id="navQuestDot" hidden></i>
+  </button>
+  <button class="nav-btn" data-nav="stats" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+    <span>Verlauf</span>
+  </button>
+  <button class="nav-btn" data-nav="settings" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M22 12h-3M5 12H2m15.5-6.5-2.1 2.1M8.6 15.4l-2.1 2.1m11 0-2.1-2.1M8.6 8.6 6.5 6.5"/></svg>
+    <span>System</span>
+  </button>
+</nav>
+
+<!-- ── Overlays ───────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay" hidden></div>
+<div class="levelup" id="levelup" hidden></div>
+<div class="toast-stack" id="toasts"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

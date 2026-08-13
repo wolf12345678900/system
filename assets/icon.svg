@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="34%" r="72%">
+      <stop offset="0%"  stop-color="#0d2246"/>
+      <stop offset="60%" stop-color="#060c1a"/>
+      <stop offset="100%" stop-color="#03050b"/>
+    </radialGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#8ce8ff"/>
+      <stop offset="100%" stop-color="#2b7fff"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- Gitternetz -->
+  <g stroke="#5ad8ff" stroke-width="1" opacity="0.10">
+    <path d="M0 128h512M0 256h512M0 384h512M128 0v512M256 0v512M384 0v512"/>
+  </g>
+
+  <!-- Eckwinkel -->
+  <g stroke="#5ad8ff" stroke-width="10" fill="none" opacity="0.85" stroke-linecap="square">
+    <path d="M56 122V56h66"/>
+    <path d="M390 56h66v66"/>
+    <path d="M456 390v66h-66"/>
+    <path d="M122 456H56v-66"/>
+  </g>
+
+  <!-- Gate-Raute -->
+  <g filter="url(#glow)">
+    <path d="M256 118 394 256 256 394 118 256Z"
+          fill="none" stroke="url(#edge)" stroke-width="14" stroke-linejoin="miter"/>
+    <path d="M256 186 326 256 256 326 186 256Z" fill="#5ad8ff" opacity="0.92"/>
+  </g>
+</svg>
