@@ -915,14 +915,20 @@ export function renderSettings(S, A) {
 
     ${win('Daten', `
       <p class="sys-text" style="margin-bottom:14px">
-        Alles liegt ausschließlich in diesem Browser. Lege regelmäßig ein Backup an —
-        gelöschte Browserdaten löschen auch deinen Fortschritt.
+        Alles liegt ausschließlich auf diesem Gerät. Lege regelmäßig ein Backup an —
+        wird die App gelöscht oder der Speicher geleert, ist der Fortschritt weg.
       </p>
       <div class="btn-row">
         <button class="btn" data-act="export">Backup sichern</button>
         <button class="btn" data-act="import">Backup laden</button>
       </div>
       <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <div class="spacer"></div>
+      <p class="label" style="margin:8px 0">Falls das Sichern als Datei nicht klappt</p>
+      <div class="btn-row">
+        <button class="btn btn--ghost btn--sm" data-act="copy">Als Text kopieren</button>
+        <button class="btn btn--ghost btn--sm" data-act="paste">Text einfügen</button>
+      </div>
       <div class="divider"></div>
       <button class="btn btn--ghost" data-act="reset">Alles zurücksetzen</button>`)}
 
@@ -960,6 +966,8 @@ export function renderSettings(S, A) {
   }));
 
   el.querySelector('[data-act="export"]').onclick = () => A.exportBackup();
+  el.querySelector('[data-act="copy"]').onclick = () => A.copyBackup();
+  el.querySelector('[data-act="paste"]').onclick = () => A.pasteBackup();
   el.querySelector('[data-act="import"]').onclick = () => el.querySelector('#importFile').click();
   el.querySelector('#importFile').onchange = (e) => {
     if (e.target.files[0]) A.importBackup(e.target.files[0]);

@@ -31,6 +31,8 @@ const A = {
   finishJobQuest,
   afterAwakening,
   exportBackup,
+  copyBackup,
+  pasteBackup,
   importBackup,
   hardReset,
 };
@@ -378,10 +380,60 @@ function scheduleReminder() {
 
 /* ── Backup ───────────────────────────────────────────────────────── */
 
-function exportBackup() {
+async function exportBackup() {
   St.saveNow(S);
-  St.exportFile(S);
-  toast('Backup wurde heruntergeladen.', { kind: 'gold', sound: 'unlock' });
+  try {
+    const how = await St.exportFile(S);
+    if (how === 'cancelled') return;
+    toast(how === 'shared' ? 'Backup zum Sichern weitergereicht.' : 'Backup wurde heruntergeladen.',
+      { kind: 'gold', sound: 'unlock' });
+  } catch (err) {
+    console.error(err);
+    toast('Sichern fehlgeschlagen. Nimm „Als Text kopieren".', { kind: 'danger' });
+  }
+}
+
+async function copyBackup() {
+  St.saveNow(S);
+  try {
+    const len = await St.exportClipboard(S);
+    toast(`Speicherstand kopiert (${len} Zeichen). Sicher ihn in einer Notiz.`,
+      { kind: 'gold', sound: 'unlock', ms: 6500 });
+  } catch (err) {
+    console.error(err);
+    toast('Kopieren wurde vom Browser blockiert.', { kind: 'danger' });
+  }
+}
+
+function pasteBackup() {
+  openOverlay(win('Speicherstand einfügen', `
+    <p class="sys-text" style="margin-bottom:14px">
+      Füge hier den kopierten Text ein. Dein aktueller Fortschritt wird dabei ersetzt.
+    </p>
+    <textarea class="input" id="pasteBox" rows="5" placeholder="{ … }"
+              style="height:120px;padding:12px;font-size:12px;resize:vertical"></textarea>
+    <div class="spacer"></div>
+    <div class="btn-row">
+      <button class="btn btn--ghost" data-act="cancel">Abbrechen</button>
+      <button class="btn btn--primary" data-act="ok">Wiederherstellen</button>
+    </div>`));
+  const ov = $('#overlay');
+  ov.querySelector('[data-act="cancel"]').onclick = () => closeOverlay();
+  ov.querySelector('[data-act="ok"]').onclick = () => {
+    const txt = ov.querySelector('#pasteBox').value.trim();
+    try {
+      S = St.importText(txt);
+      St.saveNow(S);
+      A_.setEnabled(S.settings.sound);
+      closeOverlay();
+      handleRollover();
+      setView('status');
+      toast('Speicherstand wiederhergestellt.', { kind: 'gold', sound: 'unlock' });
+    } catch (err) {
+      sfx.deny();
+      toast(`Fehlgeschlagen: ${err.message}`, { kind: 'danger', sound: null });
+    }
+  };
 }
 
 async function importBackup(file) {

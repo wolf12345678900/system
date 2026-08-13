@@ -1,0 +1,11 @@
+# Werkzeug-Einstellungen, gehören nicht ins Repository
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+
+# Windows / macOS
+Thumbs.db
+desktop.ini
+.DS_Store

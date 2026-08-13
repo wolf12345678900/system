@@ -124,12 +124,40 @@ hinzufügen*. Danach startet sie wie eine normale App, im Vollbild und offline.
 
 ## Deine Daten
 
-Alles liegt ausschließlich im lokalen Speicher deines Browsers. Kein Server,
-kein Account, keine Übertragung.
+Alles liegt im lokalen Speicher (`localStorage`) des jeweiligen Geräts, unter dem
+Schlüssel `system.save.v1`. Kein Server, kein Account, keine Übertragung.
+Gespeichert wird nach jeder Aktion automatisch.
 
-Das bedeutet auch: **gelöschte Browserdaten löschen deinen Fortschritt.**
-Unter *System → Daten* kannst du jederzeit ein Backup als JSON-Datei sichern und
-wieder einspielen. Mach das regelmäßig.
+**Jedes Gerät hat seinen eigenen Speicherstand.** PC und iPhone laufen getrennt,
+und auf dem iPhone hat die installierte Homescreen-App einen anderen Speicher als
+derselbe Link im Safari-Tab.
+
+**Der Fortschritt geht verloren bei:** gelöschten Browser-/Websitedaten, Privat-
+bzw. Inkognito-Modus, gelöschtem Homescreen-Symbol (iOS), einem anderen Browser
+oder einer anderen Adresse.
+
+Unter *System → Daten* gibt es deshalb vier Wege:
+
+| | |
+|---|---|
+| **Backup sichern** | Auf dem iPhone öffnet sich der Teilen-Dialog (→ Dateien, iCloud, Chat), am PC lädt eine JSON-Datei herunter. |
+| **Backup laden** | Datei auswählen und wiederherstellen. |
+| **Als Text kopieren** | Speicherstand in die Zwischenablage — für eine Notiz oder eine Nachricht an dich selbst. |
+| **Text einfügen** | Aus so einem Text wiederherstellen. |
+
+Über Sichern und Laden holst du deinen Fortschritt auch vom PC aufs Handy.
+Mach das regelmäßig.
+
+## Updates
+
+Der Service Worker holt Programmcode (`.js`, `.css`, `.html`, Manifest) immer
+zuerst aus dem Netz und nutzt den Cache nur, wenn keine Verbindung besteht.
+Neue Dateien hochladen genügt also — beim nächsten Start ist die App aktuell.
+Bilder kommen weiter aus dem Cache.
+
+Bei größeren Änderungen die Zahl in `CACHE` in `sw.js` hochzählen
+(`system-v2` → `system-v3`), dann wird der alte Cache beim nächsten Start
+vollständig verworfen.
 
 ---
 

@@ -2,7 +2,7 @@
    sw.js — Service Worker: App-Shell zwischenspeichern, offline nutzbar
    ══════════════════════════════════════════════════════════════════ */
 
-const CACHE = 'system-v1';
+const CACHE = 'system-v2';
 
 const SHELL = [
   './',
@@ -41,34 +41,52 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+/* Programmcode muss aktuell sein, Bilder dürfen aus dem Cache kommen. */
+const CODE = /\.(?:js|css|html|webmanifest)$/i;
+
+/** Erst Netz, bei Erfolg Cache auffrischen; offline aus dem Cache. */
+async function networkFirst(req, cacheKey = null) {
+  try {
+    const res = await fetch(req);
+    if (res && res.ok) {
+      const copy = res.clone();
+      caches.open(CACHE).then((c) => c.put(cacheKey || req, copy));
+    }
+    return res;
+  } catch (err) {
+    const hit = await caches.match(cacheKey || req);
+    if (hit) return hit;
+    throw err;
+  }
+}
+
+/** Erst Cache, sonst Netz — für Dateien, die sich praktisch nie ändern. */
+async function cacheFirst(req) {
+  const hit = await caches.match(req);
+  if (hit) return hit;
+  const res = await fetch(req);
+  if (res && res.ok && res.type === 'basic') {
+    const copy = res.clone();
+    caches.open(CACHE).then((c) => c.put(req, copy));
+  }
+  return res;
+}
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET' || !req.url.startsWith(self.location.origin)) return;
 
-  // Navigationen: erst Netz, dann Cache — so kommen Updates an.
+  // Die Seite selbst
   if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put('index.html', copy));
-          return res;
-        })
+      networkFirst(req, 'index.html')
         .catch(() => caches.match('index.html').then((r) => r || caches.match('./')))
     );
     return;
   }
 
-  // Alles andere: erst Cache, dann Netz.
-  e.respondWith(
-    caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-      if (res.ok && res.type === 'basic') {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(req, copy));
-      }
-      return res;
-    }))
-  );
+  const path = new URL(req.url).pathname;
+  e.respondWith(CODE.test(path) ? networkFirst(req) : cacheFirst(req));
 });
 
 self.addEventListener('message', (e) => {

@@ -157,17 +157,58 @@ function migrate(data) {
 
 /* ── Export / Import ──────────────────────────────────────────────── */
 
-export function exportFile(state) {
+/**
+ * Sichert den Speicherstand.
+ * Auf iOS läuft ein normaler Download in der installierten App ins Leere —
+ * dort wird stattdessen der Teilen-Dialog benutzt, über den die Datei in
+ * „Dateien", iCloud oder einen Chat wandert.
+ * Rückgabe: 'shared' | 'downloaded' | 'cancelled'
+ */
+export async function exportFile(state) {
   const stamp = dayKey(Date.now(), state.settings.resetHour);
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const name = `system-backup-${stamp}.json`;
+  const text = JSON.stringify(state, null, 2);
+  const blob = new Blob([text], { type: 'application/json' });
+
+  if (navigator.canShare) {
+    try {
+      const file = new File([blob], name, { type: 'application/json' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'THE SYSTEM — Backup' });
+        return 'shared';
+      }
+    } catch (err) {
+      if (err?.name === 'AbortError') return 'cancelled';
+      // sonst weiter zum Download
+    }
+  }
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `system-backup-${stamp}.json`;
+  a.download = name;
+  a.rel = 'noopener';
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return 'downloaded';
+}
+
+/** Letzte Rettung, wenn weder Teilen noch Download klappt. */
+export async function exportClipboard(state) {
+  const text = JSON.stringify(state);
+  await navigator.clipboard.writeText(text);
+  return text.length;
+}
+
+/** Speicherstand aus eingefügtem Text wiederherstellen. */
+export function importText(text) {
+  const data = JSON.parse(text);
+  if (typeof data !== 'object' || data === null || !('stats' in data)) {
+    throw new Error('Der Text enthält keinen gültigen Speicherstand.');
+  }
+  return migrate(data);
 }
 
 export function importFile(file) {
